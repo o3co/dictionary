@@ -1,0 +1,25 @@
+{
+    "name": "o3co/dictionary",
+    "description": "O3Co Dictionary Component",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Yoshi",
+            "email": "yoshi@1o1.co.jp"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "symfony/config" : "~2.5.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"O3Co\\Dictionary\\": ""
+		}
+	},
+	"extra": {
+        "branch-alias": {
+            "dev-master": "0.1-dev"
+        }
+	}
+}
