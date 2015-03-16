@@ -14,6 +14,8 @@ use O3Co\Dictionary\Term;
  */
 class SimpleTerm implements Term 
 {
+	private $data;
+
 	/**
 	 * __construct 
 	 * 
@@ -28,6 +30,11 @@ class SimpleTerm implements Term
 		foreach($data as $key => $value) {
 			$this->set($key, $value);
 		}
+	}
+
+	public function has($field)
+	{
+		return isset($this->data[$field]);
 	}
 
 	/**

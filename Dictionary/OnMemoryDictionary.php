@@ -3,6 +3,8 @@ namespace O3Co\Dictionary\Dictionary;
 
 use O3Co\Dictionary\Dictionary;
 use O3Co\Dictionary\Term;
+use O3Co\Dictionary\Indexer;
+use O3Co\Dictionary\Indexer\ArrayIndexer;
 
 /**
  * OnMemoryDictionary 
@@ -24,12 +26,12 @@ class OnMemoryDictionary implements Dictionary, \Countable, \IteratorAggregate
 	private $terms;
 
 	/**
-	 * indexes 
+	 * indexer
 	 * 
 	 * @var mixed
 	 * @access private
 	 */
-	private $indexes;
+	private $indexer;
 
 	/**
 	 * indexedBy 
@@ -39,14 +41,14 @@ class OnMemoryDictionary implements Dictionary, \Countable, \IteratorAggregate
 	 */
 	private $indexedBy;
 
-	public function __construct(array $terms = array(), $indexedBy = 'id')
+	public function __construct(array $terms = array(), Indexer $indexer = null)
 	{
-		$this->indexes = false;
-		$this->indexedBy = $indexedBy;
-
 		foreach($terms as $term) {
 			$this->add($term);
 		}
+
+		// DefaultIndexer just pass the ArrayIterator of Terms 
+		$this->indexer = $indexer;
 	}
 
 	/**
@@ -60,7 +62,7 @@ class OnMemoryDictionary implements Dictionary, \Countable, \IteratorAggregate
 	{
 		$this->terms[] = $term;
 
-		$this->indexes = false;
+		$this->getIndexer()->reset();
 
 		return $this;
 	}
@@ -74,14 +76,7 @@ class OnMemoryDictionary implements Dictionary, \Countable, \IteratorAggregate
 	 */
 	public function find($id)
 	{
-		if(!$this->indexes) {
-			$this->index($this->indexedBy);
-		}
-		if(!isset($this->indexes[$id])) {
-			return false;
-		}
-		
-		return $this->indexes[$id];
+		return $this->getIndexer()->get($id);
 	}
 
 	/**
@@ -103,23 +98,18 @@ class OnMemoryDictionary implements Dictionary, \Countable, \IteratorAggregate
 		return false;
 	}
 
-	public function getIndexes()
+	public function getIndexer()
 	{
-		return $this->indexes;
-	}
-
-	public function index($indexBy)
-	{
-		$this->indexedBy = $indexBy;
-		$this->indexes = array();
-
-		foreach($this->terms as $term) {
-			$this->indexes[strtolower($term->get($this->indexedBy))] = $term;
+		if(!$this->indexer) {
+			$this->indexer = new ArrayIndexer($this);
 		}
-
-		return $this->indexes;
+		return $this->indexer;
 	}
 
+	public function setIndexer(Indexer $indexer)
+	{
+		$this->indexer = $indexer;
+	}
 	/**
 	 * count 
 	 * 
@@ -139,7 +129,12 @@ class OnMemoryDictionary implements Dictionary, \Countable, \IteratorAggregate
 	 */
 	public function getIterator()
 	{
-		return new \ArrayIterator($this->terms);
+		return $this->getIndexer()->getIterator();
+	}
+
+	public function getTerms()
+	{
+		return $this->terms;
 	}
 }
 

@@ -4,6 +4,7 @@ namespace O3Co\Dictionary\Loader;
 use O3Co\Dictionary\Loader;
 use O3Co\Dictionary\Dictionary\OnMemoryDictionary;
 use O3Co\Dictionary\Term\SimpleTerm;
+use O3Co\Dictionary\Indexer\FieldIndexer;
 
 /**
  * ArrayLoader 
@@ -16,7 +17,7 @@ use O3Co\Dictionary\Term\SimpleTerm;
  */
 class ArrayLoader implements Loader
 {
-	private $defaultIndexField = 'id';
+	private $defaultIndexField = false;
 
 	/**
 	 * load 
@@ -49,12 +50,17 @@ class ArrayLoader implements Loader
 			$terms[] = $this->parseTerm($resource);
 		}
 		
-		return new OnMemoryDictionary($terms, $this->defaultIndexField);
+		$dictionary = new OnMemoryDictionary($terms);
+		if($this->defaultIndexField) {
+			$indexer = new FieldIndexer($dictionary, $this->defaultIndexField);
+			$dictionary->setIndexer($indexer);
+		}
+		return $dictionary;
 	}
 
 	protected function parseTerm(array $resource)
 	{
-		$term = new SimpleTerm($resource, $this->defaultIndexField);
+		$term = new SimpleTerm($resource);
 
 		return $term;
 	}

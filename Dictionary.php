@@ -30,12 +30,20 @@ interface Dictionary
 	function findBy($field, $key);
 
 	/**
-	 * index 
+	 * getIndexer 
 	 * 
-	 * @param mixed $field 
 	 * @access public
 	 * @return void
 	 */
-	function index($field);
+	function getIndexer();
+
+	/**
+	 * setIndexer 
+	 * 
+	 * @param Indexer $indexer 
+	 * @access public
+	 * @return void
+	 */
+	function setIndexer(Indexer $indexer);
 }
 
